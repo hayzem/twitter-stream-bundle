@@ -1,0 +1,4 @@
+services:
+#    hayzem_twitter_stream.example:
+#        class: Hayzem\TwitterStreamBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]
