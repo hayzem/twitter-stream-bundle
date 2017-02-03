@@ -1,0 +1,108 @@
+<?php
+namespace Hayzem\TwitterStreamBundle\Command;
+
+use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/**
+ * @author Ali Atasever <aliatasever@gmail.com>
+ */
+class TwitterTrackCommand extends Command
+{
+    const BLOCK_SIZE = 1;
+    /**
+     * @var Client
+     */
+    private $client;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param Client $client
+     * @param LoggerInterface $logger
+     */
+    public function __construct(Client $client, LoggerInterface $logger)
+    {
+        parent::__construct();
+
+        $this->client = $client;
+        $this->logger = $logger;
+    }
+
+    protected function configure()
+    {
+        $this
+            ->setName('hayzem:twitter:stream:track')
+            ->setDescription('Check for new tweets using a stream and push them');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->logger->info("Opening twitter stream...");
+
+        $response = $this->client->post('statuses/filter.json', [
+            'form_params' => [
+                'track' => 'istanbul'
+            ],
+            'stream' => true
+        ]);
+
+        $stream = $response->getBody();
+
+        // Read until the stream is closed
+        $this->logger->info('Reading stream');
+        $line = '';
+        while (!$stream->eof()) {
+            $line .= $stream->read(static::BLOCK_SIZE);
+            while (strstr($line, "\r\n") !== false) {
+                list($json, $line) = explode("\r\n", $line, 2);
+                $this->logger->debug('Got a line', ['line' => $json]);
+                if (trim($json) == '') {
+                    $this->logger->debug('Keep alive');
+                    continue;
+                }
+                $data = json_decode($json, true);
+                if (isset($data['text'])) {
+                    $this->logger->info('Received tweet', ['tweet' => $data]);
+                    //Filter replies and retweets
+                    if ($data['user']['id_str']) {
+                        dump($data);
+                        try {
+                            $this->logger->notice(
+                                'Sent tweet',
+                                [
+                                    'TweetId' => $data['id_str']
+                                ]
+                            );
+                        } catch (\Exception $e) {
+                            $this->logger->error(
+                                "Failed to push",
+                                [
+                                    'TweetId' => $data['id_str'],
+                                    'Exception' => $e
+                                ]
+                            );
+                        }
+                    } else {
+                        $this->logger->info('Ignored tweet', ['TweetId' => $data['id_str']]);
+                    }
+                } else {
+                    $this->logger->debug(
+                        'Other message',
+                        [
+                            'message' => $data
+                        ]
+                    );
+                }
+            }
+        }
+
+        $this->logger->info('Stream finished');
+    }
+}

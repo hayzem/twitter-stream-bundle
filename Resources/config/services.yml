@@ -1,3 +1,38 @@
+parameters:
+    twitter.consumer_key: 'adrK97NRpOEbO2ZplcUtay2rw'
+    twitter.consumer_secret: 'cvwSsaO20bUOKWcOU4ixPFPcaczx94aXwTG18w0rrAsFdHn6sT'
+    twitter.token: '1300030753-MvguajYLzIVbojYtqpFjX2qpeZYpLMyqpAZdvY7'
+    twitter.token_secret: 'lbvnfIxfIBFzbRiZtOE9Q1avUj2HlMOYrJGTof5vSEWtI'
+    gcm_ttl: ''
+    link_placeholder: ''
+    max_pushes_per_hour: ''
+
 services:
     hayzem_twitter_stream.service.twitter-stream-service:
         class: Hayzem\TwitterStreamBundle\Service\TwitterStreamService
+
+    hayzem_twitter_stream.command.twitter-track-command:
+            class: Hayzem\TwitterStreamBundle\Command\TwitterTrackCommand
+            arguments:
+                - "@hayzem_twitter_stream.twitter_stream_client"
+                - "@logger"
+            tags:
+                - { name: console.command }
+
+    hayzem_twitter_stream.twitter_stream_client:
+            class: GuzzleHttp\Client
+            factory: [Hayzem\TwitterStreamBundle\DependencyInjection\GuzzleClientFactory, get]
+            arguments:
+                -
+                    base_uri: "https://stream.twitter.com/1.1/"
+                    auth: oauth
+                - "@hayzem_twitter_stream.twitter_oauth"
+
+    hayzem_twitter_stream.twitter_oauth:
+        class: GuzzleHttp\Subscriber\Oauth\Oauth1
+        arguments:
+            -
+                consumer_key: "%twitter.consumer_key%"
+                consumer_secret: "%twitter.consumer_secret%"
+                token: "%twitter.token%"
+                token_secret: "%twitter.token_secret%"
