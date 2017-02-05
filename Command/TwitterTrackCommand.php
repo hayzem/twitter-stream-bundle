@@ -44,14 +44,15 @@ class TwitterTrackCommand extends ContainerAwareCommand
         $this
             ->setName('hayzem:twitter:stream:track')
             ->setDescription('Track statuses')
-            ->addArgument('keywords',InputArgument::REQUIRED,'Tracking keywords separated with comma');
+            ->addArgument('keywords',InputArgument::REQUIRED,'Tracking keywords separated with comma')
+            ->addArgument('trackingId',InputArgument::OPTIONAL,'Track statuses with tracking id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger->info("Opening twitter stream...");
 
-        $eventDispacther = $this->getContainer()->get('event_dispatcher');
+        $eventDispatcher = $this->getContainer()->get('event_dispatcher');
 
         $response = $this->client->post('statuses/filter.json', [
             'form_params' => [
@@ -79,8 +80,9 @@ class TwitterTrackCommand extends ContainerAwareCommand
                     $this->logger->info('Received tweet', ['tweet' => $data]);
                     //Filter replies and retweets
                     if ($data['user']['id_str']) {
-                        dump($data);
+                        dump($data['created_at'].': '.$data['text']);
                         try {
+//                            $eventDispatcher->dispatch('twitter');
                             $this->logger->notice(
                                 'New status',
                                 [

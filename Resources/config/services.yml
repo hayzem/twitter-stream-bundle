@@ -12,21 +12,21 @@ services:
         class: Hayzem\TwitterStreamBundle\Service\TwitterStreamService
 
     hayzem_twitter_stream.command.twitter-track-command:
-            class: Hayzem\TwitterStreamBundle\Command\TwitterTrackCommand
-            arguments:
-                - "@hayzem_twitter_stream.twitter_stream_client"
-                - "@logger"
-            tags:
-                - { name: console.command }
+        class: Hayzem\TwitterStreamBundle\Command\TwitterTrackCommand
+        arguments:
+            - "@hayzem_twitter_stream.twitter_stream_client"
+            - "@logger"
+        tags:
+            - { name: console.command }
 
     hayzem_twitter_stream.twitter_stream_client:
-            class: GuzzleHttp\Client
-            factory: [Hayzem\TwitterStreamBundle\DependencyInjection\GuzzleClientFactory, get]
-            arguments:
-                -
-                    base_uri: "https://stream.twitter.com/1.1/"
-                    auth: oauth
-                - "@hayzem_twitter_stream.twitter_oauth"
+        class: GuzzleHttp\Client
+        factory: [Hayzem\TwitterStreamBundle\DependencyInjection\GuzzleClientFactory, get]
+        arguments:
+            -
+                base_uri: "https://stream.twitter.com/1.1/"
+                auth: oauth
+            - "@hayzem_twitter_stream.twitter_oauth"
 
     hayzem_twitter_stream.twitter_oauth:
         class: GuzzleHttp\Subscriber\Oauth\Oauth1
