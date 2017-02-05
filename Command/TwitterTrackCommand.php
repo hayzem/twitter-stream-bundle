@@ -3,14 +3,18 @@ namespace Hayzem\TwitterStreamBundle\Command;
 
 use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\Input;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Ali Atasever <aliatasever@gmail.com>
  */
-class TwitterTrackCommand extends Command
+class TwitterTrackCommand extends ContainerAwareCommand
 {
     const BLOCK_SIZE = 1;
     /**
@@ -39,16 +43,19 @@ class TwitterTrackCommand extends Command
     {
         $this
             ->setName('hayzem:twitter:stream:track')
-            ->setDescription('Check for new tweets using a stream and push them');
+            ->setDescription('Track statuses')
+            ->addArgument('keywords',InputArgument::REQUIRED,'Tracking keywords separated with comma');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger->info("Opening twitter stream...");
 
+        $eventDispacther = $this->getContainer()->get('event_dispatcher');
+
         $response = $this->client->post('statuses/filter.json', [
             'form_params' => [
-                'track' => 'istanbul'
+                'track' => $input->getArgument('keywords')
             ],
             'stream' => true
         ]);
@@ -75,14 +82,14 @@ class TwitterTrackCommand extends Command
                         dump($data);
                         try {
                             $this->logger->notice(
-                                'Sent tweet',
+                                'New status',
                                 [
                                     'TweetId' => $data['id_str']
                                 ]
                             );
                         } catch (\Exception $e) {
                             $this->logger->error(
-                                "Failed to push",
+                                "Failed to dispatch",
                                 [
                                     'TweetId' => $data['id_str'],
                                     'Exception' => $e
