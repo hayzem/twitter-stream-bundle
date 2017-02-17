@@ -39,7 +39,7 @@ class TrackControlListener
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
 
-        exec('php '.$this->command.' start '.$trackId.' '.$keywords.$this->commandTail);
+        exec('php '.$this->command.' start '.$trackId.' "'.$keywords.'" '.$this->commandTail);
     }
 
     public function updateTrackHandler(TrackEvent $trackEvent)
@@ -47,7 +47,7 @@ class TrackControlListener
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
 
-        exec('php '.$this->command.' restart '.$trackId.' '.$keywords.$this->commandTail);
+        exec('php '.$this->command.' restart '.$trackId.' "'.$keywords.'" '.$this->commandTail);
     }
 
     public function stopTrackHandler(TrackEvent $trackEvent)
