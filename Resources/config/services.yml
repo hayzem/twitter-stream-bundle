@@ -36,3 +36,11 @@ services:
                 consumer_secret: "%twitter.consumer_secret%"
                 token: "%twitter.token%"
                 token_secret: "%twitter.token_secret%"
+
+    hayzem_twitter_stream.event.track.control:
+        class: Hayzem\TwitterStreamBundle\EventListener\TrackControlListener
+        tags:
+            - {name: kernel.event_listener, event:twitter_stream.event.track.control.start, method:startTrackHandler}
+            - {name: kernel.event_listener, event:twitter_stream.event.track.control.restart, method:restartTrackHandler}
+            - {name: kernel.event_listener, event:twitter_stream.event.track.control.stop, method:stopTrackHandler}
+

@@ -6,7 +6,9 @@
 namespace Hayzem\TwitterStreamBundle\Event;
 
 
-class TrackEvent
+use Symfony\Component\EventDispatcher\Event;
+
+class TrackEvent extends Event
 {
     /**
      * @var string

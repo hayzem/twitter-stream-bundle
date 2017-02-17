@@ -2,6 +2,7 @@
 namespace Hayzem\TwitterStreamBundle\Command;
 
 use GuzzleHttp\Client;
+use Hayzem\TwitterStreamBundle\Event\StatusEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
@@ -45,7 +46,7 @@ class TwitterTrackCommand extends ContainerAwareCommand
             ->setName('hayzem:twitter:stream:track')
             ->setDescription('Track statuses')
             ->addArgument('keywords',InputArgument::REQUIRED,'Tracking keywords separated with comma')
-            ->addArgument('trackingId',InputArgument::OPTIONAL,'Track statuses with tracking id');
+            ->addArgument('trackId',InputArgument::REQUIRED,'Track statuses with tracking id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -80,9 +81,13 @@ class TwitterTrackCommand extends ContainerAwareCommand
                     $this->logger->info('Received tweet', ['tweet' => $data]);
                     //Filter replies and retweets
                     if ($data['user']['id_str']) {
-                        dump($data['created_at'].': '.$data['text']);
+                        $statusEvent = new StatusEvent();
+                        $statusEvent->setStatusData($data);
+                        $statusEvent->setOptions([
+                            'trackId' => $input->getArgument('trackId')
+                        ]);
                         try {
-//                            $eventDispatcher->dispatch('twitter');
+                            $eventDispatcher->dispatch('twitter_stream.event.track.status', $statusEvent);
                             $this->logger->notice(
                                 'New status',
                                 [
