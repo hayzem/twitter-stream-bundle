@@ -64,7 +64,7 @@ class TwitterStreamCommand extends ContainerAwareCommand
 
     protected function start($keywords, $trackId)
     {
-        exec("php $this->command $keywords $trackId > /dev/null 2>/dev/null &");
+        exec("php $this->command '$keywords' $trackId > /dev/null 2>/dev/null &");
     }
 
     protected function isRunning($trackId){
