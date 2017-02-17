@@ -39,6 +39,7 @@ services:
 
     hayzem_twitter_stream.event.track.control:
         class: Hayzem\TwitterStreamBundle\EventListener\TrackControlListener
+        arguments: ["%kernel.root_dir%"]
         tags:
             - {name: kernel.event_listener, event:twitter_stream.event.track.control.start, method:startTrackHandler}
             - {name: kernel.event_listener, event:twitter_stream.event.track.control.restart, method:restartTrackHandler}

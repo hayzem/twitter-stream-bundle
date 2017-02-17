@@ -6,15 +6,14 @@
 namespace Hayzem\TwitterStreamBundle\Command;
 
 
-use Symfony\Component\Console\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
-class TwitterStreamCommand extends Command
+class TwitterStreamCommand extends ContainerAwareCommand
 {
-    private $command = 'hayzem:twitter:stream:track';
+    private $command;
 
     protected function configure()
     {
@@ -28,6 +27,10 @@ class TwitterStreamCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $kernelRootDir = $this->getContainer()->getParameter('kernel.root_dir');
+        $appDir = str_replace('/app', '', $kernelRootDir);
+        $this->command = $appDir.'/bin/console hayzem:twitter:stream:track';
+
         $mode = $input->getArgument('mode');
         if($mode == "start"){
             /**
@@ -61,7 +64,7 @@ class TwitterStreamCommand extends Command
 
     protected function start($keywords, $trackId)
     {
-        exec("php bin/console $this->command $keywords $trackId > /dev/null 2>/dev/null &");
+        exec("php $this->command $keywords $trackId > /dev/null 2>/dev/null &");
     }
 
     protected function isRunning($trackId){

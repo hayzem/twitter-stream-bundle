@@ -9,6 +9,22 @@ use Hayzem\TwitterStreamBundle\Event\TrackEvent;
 
 class TrackControlListener
 {
+    /**
+     * @var string
+     */
+    protected $command;
+
+    protected $commandTail;
+    private $kernelRootDir;
+
+    public function __construct($kernelRootDir)
+    {
+        $this->kernelRootDir = str_replace('/app', '', $kernelRootDir);
+        $this->command = $this->kernelRootDir.'/bin/console hayzem:twitter:stream:control';
+        $this->commandTail = ' > /dev/null 2>/dev/null &';
+
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
@@ -23,7 +39,7 @@ class TrackControlListener
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
 
-        exec('php bin/console hayzem:twitter:stream:control start '.$trackId.' '.$keywords);
+        exec('php '.$this->command.' start '.$trackId.' '.$keywords.$this->commandTail);
     }
 
     public function updateTrackHandler(TrackEvent $trackEvent)
@@ -31,13 +47,13 @@ class TrackControlListener
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
 
-        exec('php bin/console hayzem:twitter:stream:control restart '.$trackId.' '.$keywords);
+        exec('php '.$this->command.' restart '.$trackId.' '.$keywords.$this->commandTail);
     }
 
     public function stopTrackHandler(TrackEvent $trackEvent)
     {
         $trackId = $trackEvent->getTrackId();
 
-        exec('php bin/console hayzem:twitter:stream:control stop '.$trackId);
+        exec('php '.$this->command.' stop '.$trackId.$this->commandTail);
     }
 }
