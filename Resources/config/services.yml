@@ -15,7 +15,7 @@ services:
         class: Hayzem\TwitterStreamBundle\Command\TwitterTrackCommand
         arguments:
             - "@hayzem_twitter_stream.twitter_stream_client"
-            - "@logger"
+            - "@monolog.logger"
         tags:
             - { name: console.command }
 

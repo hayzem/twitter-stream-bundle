@@ -3,11 +3,8 @@ namespace Hayzem\TwitterStreamBundle\Command;
 
 use GuzzleHttp\Client;
 use Hayzem\TwitterStreamBundle\Event\StatusEvent;
-use Psr\Log\LoggerInterface;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,15 +21,15 @@ class TwitterTrackCommand extends ContainerAwareCommand
     private $client;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     private $logger;
 
     /**
      * @param Client $client
-     * @param LoggerInterface $logger
+     * @param Logger $logger
      */
-    public function __construct(Client $client, LoggerInterface $logger)
+    public function __construct(Client $client, Logger $logger)
     {
         parent::__construct();
 
