@@ -29,7 +29,7 @@ class TrackControlListener
     {
         return array(
             'twitter_stream.event.track.control.start' => 'startTrackHandler',
-            'twitter_stream.event.track.control.update' => 'updateTrackHandler',
+            'twitter_stream.event.track.control.restart' => 'restartTrackHandler',
             'twitter_stream.event.track.control.stop' => 'stopTrackHandler',
         );
     }
@@ -42,7 +42,7 @@ class TrackControlListener
         exec('php '.$this->command.' start '.$trackId.' "'.$keywords.'" '.$this->commandTail);
     }
 
-    public function updateTrackHandler(TrackEvent $trackEvent)
+    public function restartTrackHandler(TrackEvent $trackEvent)
     {
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
