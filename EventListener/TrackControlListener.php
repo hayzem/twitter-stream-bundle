@@ -44,7 +44,12 @@ class TrackControlListener
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
 
-        $this->logger->addInfo('[twitter] new keyword started tracking');
+        $this->logger->notice(
+            '[twitter] starting tracking keywords',
+            [
+                'trackId' => $trackId['id_str']
+            ]
+        );
 
         exec('php '.$this->command.' start '.$trackId.' "'.$keywords.'" '.$this->commandTail);
     }
