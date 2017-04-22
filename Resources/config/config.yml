@@ -1,1 +1,23 @@
-monolog: ~
+monolog:
+    handlers:
+        # Examples:
+        syslog:
+            type:                stream
+            path:                /var/log/symfony.log
+            level:               ERROR
+            bubble:              false
+            formatter:           my_formatter
+        main:
+            type:                fingers_crossed
+            action_level:        WARNING
+            # By default, buffer_size is unlimited (0), which could
+            # generate huge logs.
+            buffer_size:         0
+            handler:             custom
+        console:
+            type:                console
+            verbosity_levels:
+                VERBOSITY_NORMAL:       WARNING
+                VERBOSITY_VERBOSE:      NOTICE
+                VERBOSITY_VERY_VERBOSE: INFO
+                VERBOSITY_DEBUG:        DEBUG
