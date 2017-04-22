@@ -6,6 +6,7 @@
 namespace Hayzem\TwitterStreamBundle\EventListener;
 
 use Hayzem\TwitterStreamBundle\Event\TrackEvent;
+use Monolog\Logger;
 
 class TrackControlListener
 {
@@ -13,16 +14,20 @@ class TrackControlListener
      * @var string
      */
     protected $command;
-
     protected $commandTail;
     private $kernelRootDir;
 
-    public function __construct($kernelRootDir)
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct($kernelRootDir, Logger $logger)
     {
         $this->kernelRootDir = str_replace('/app', '', $kernelRootDir);
         $this->command = $this->kernelRootDir.'/bin/console hayzem:twitter:stream:control';
         $this->commandTail = ' > /dev/null 2>/dev/null &';
-
+        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents()
@@ -38,6 +43,8 @@ class TrackControlListener
     {
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
+
+        $this->logger->addInfo('[twitter] new keyword started tracking');
 
         exec('php '.$this->command.' start '.$trackId.' "'.$keywords.'" '.$this->commandTail);
     }
