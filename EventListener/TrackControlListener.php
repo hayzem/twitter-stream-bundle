@@ -47,7 +47,7 @@ class TrackControlListener
         $this->logger->notice(
             '[twitter] starting tracking keywords',
             [
-                'trackId' => $trackId['id_str']
+                'trackId' => $trackId
             ]
         );
 

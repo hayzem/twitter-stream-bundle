@@ -27,6 +27,8 @@ services:
                 base_uri: "https://stream.twitter.com/1.1/"
                 auth: oauth
             - "@hayzem_twitter_stream.twitter_oauth"
+            - "@monolog.logger"
+            - "@hayzem_twitter_stream.service.twitter-stream-service"
 
     hayzem_twitter_stream.twitter_oauth:
         class: GuzzleHttp\Subscriber\Oauth\Oauth1
