@@ -23,5 +23,5 @@ abstract class AbstractStatusTrackListener
     abstract public function startStatusTrackHandler();
     abstract public function statusEventHandler(StatusEvent $statusEvent);
     abstract public function keywordsUpdatedHandler(TrackEvent $trackEvent);
-    abstract public function stopStatusTrackHandler();
+    abstract public function stopStatusTrackHandler(TrackEvent $trackEvent);
 }
