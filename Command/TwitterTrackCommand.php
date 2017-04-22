@@ -5,8 +5,8 @@ use GuzzleHttp\Client;
 use Hayzem\TwitterStreamBundle\Event\StatusEvent;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -42,8 +42,8 @@ class TwitterTrackCommand extends ContainerAwareCommand
         $this
             ->setName('hayzem:twitter:stream:track')
             ->setDescription('Track statuses')
-            ->addArgument('keywords',InputArgument::REQUIRED,'Tracking keywords separated with comma')
-            ->addArgument('trackId',InputArgument::REQUIRED,'Track statuses with tracking id');
+            ->addOption('trackId', null, InputOption::VALUE_REQUIRED, 'Track statuses with tracking id')
+            ->addOption('keywords', null, InputOption::VALUE_REQUIRED, 'Tracking keywords separated with comma');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -52,9 +52,14 @@ class TwitterTrackCommand extends ContainerAwareCommand
 
         $eventDispatcher = $this->getContainer()->get('event_dispatcher');
 
+        $options = $input->getOptions();
+
+        $trackId = $options['trackId'];
+        $keywords = $options['keywords'];
+
         $response = $this->client->post('statuses/filter.json', [
             'form_params' => [
-                'track' => $input->getArgument('keywords')
+                'track' => $keywords
             ],
             'stream' => true
         ]);
@@ -81,7 +86,7 @@ class TwitterTrackCommand extends ContainerAwareCommand
                         $statusEvent = new StatusEvent();
                         $statusEvent->setStatusData($data);
                         $statusEvent->setOptions([
-                            'trackId' => $input->getArgument('trackId')
+                            'trackId' => $trackId
                         ]);
                         try {
                             $eventDispatcher->dispatch('twitter_stream.event.track.status', $statusEvent);

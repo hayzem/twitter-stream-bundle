@@ -22,20 +22,34 @@ class GuzzleClientFactory
         $handlerStack->push(
             Middleware::log(
                 $logger,
-                new MessageFormatter([
-                    '{method} {uri} HTTP/{version} {req_body}',
-                    'RESPONSE: {code} - {res_body}',
-                ])
+                new MessageFormatter()
+                //this throws array to string conversation exception
+//                new MessageFormatter([
+//                    '{method} {uri} HTTP/{version} {req_body}',
+//                    'RESPONSE: {code} - {res_body}',
+//                ])
             )
         );
-
-        $logger->notice('Twitter client created!',[
-            'mi' => 'acaba',
-        ]);
 
         $handlerStack->unshift($oauth1);
         $options['handler'] = $handlerStack;
 
-        return new Client($options);
+        $client = null;
+
+        try {
+            $client = new Client($options);
+            $logger->notice(
+                'New client created'
+            );
+        } catch (\Exception $e) {
+            $logger->error(
+                "Client failed when connection",
+                [
+                    'Exception' => $e
+                ]
+            );
+        }
+
+        return $client;
     }
 }

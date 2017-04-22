@@ -9,6 +9,7 @@ namespace Hayzem\TwitterStreamBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterStreamCommand extends ContainerAwareCommand
@@ -21,8 +22,8 @@ class TwitterStreamCommand extends ContainerAwareCommand
             ->setName('hayzem:twitter:stream:control')
             ->setDescription('Control twitter stream statuses')
             ->addArgument('mode',InputArgument::REQUIRED,'Tracking keywords separated with comma')
-            ->addArgument('trackId',InputArgument::REQUIRED,'Tracking ID')
-            ->addArgument('keywords',InputArgument::OPTIONAL,'Tracking keywords separated with comma');
+            ->addOption('trackId', null, InputOption::VALUE_REQUIRED, 'Track statuses with tracking id')
+            ->addOption('keywords', null, InputOption::VALUE_REQUIRED, 'Tracking keywords separated with comma');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -31,15 +32,19 @@ class TwitterStreamCommand extends ContainerAwareCommand
         $appDir = str_replace('/app', '', $kernelRootDir);
         $this->command = $appDir.'/bin/console hayzem:twitter:stream:track';
 
+        $options = $input->getOptions();
+        $trackId = $options['trackId'];
+        $keywords = $options['keywords'];
+
         $mode = $input->getArgument('mode');
         if($mode == "start"){
             /**
              * 1- check if it is already running
              * 2- if not run "php bin/console hayzem:twitter:stream:track istanbul 3"
              */
-            if(!$this->isRunning($input->getArgument('trackId'))){
+            if(!$this->isRunning($trackId)){
                 $output->writeln('Process doesn\'t exist. Starting...');
-                $this->start($input->getArgument('keywords'),$input->getArgument('trackId'));
+                $this->start($keywords,$trackId);
             }
 
             $output->writeln('Tracking started!');
@@ -64,7 +69,12 @@ class TwitterStreamCommand extends ContainerAwareCommand
 
     protected function start($keywords, $trackId)
     {
-        exec('php '.$this->command.' "'.$keywords.'" '.$trackId.' > /dev/null 2>/dev/null &');
+        if(is_array($keywords))
+        {
+            $keywords = implode(' ', $keywords);
+        }
+
+        exec('php '.$this->command.' --keywords="'.$keywords.'" --trackId='.$trackId.' > /dev/null 2>/dev/null &');
     }
 
     protected function isRunning($trackId){

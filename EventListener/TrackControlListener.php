@@ -51,7 +51,7 @@ class TrackControlListener
             ]
         );
 
-        exec('php '.$this->command.' start '.$trackId.' "'.$keywords.'" '.$this->commandTail);
+        exec('php '.$this->command.' start --trackId='.$trackId.' --keywords="'.$keywords.'" '.$this->commandTail);
     }
 
     public function restartTrackHandler(TrackEvent $trackEvent)
