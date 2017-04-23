@@ -2,6 +2,9 @@
 namespace Hayzem\TwitterStreamBundle\Command;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use Hayzem\TwitterStreamBundle\DependencyInjection\GuzzleClientFactory;
 use Hayzem\TwitterStreamBundle\Event\StatusEvent;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -57,12 +60,7 @@ class TwitterTrackCommand extends ContainerAwareCommand
         $trackId = $options['trackId'];
         $keywords = $options['keywords'];
 
-        $response = $this->client->post('statuses/filter.json', [
-            'form_params' => [
-                'track' => $keywords
-            ],
-            'stream' => true
-        ]);
+        $response = $this->getResponse($keywords);
 
         $stream = $response->getBody();
 
@@ -120,5 +118,47 @@ class TwitterTrackCommand extends ContainerAwareCommand
         }
 
         $this->logger->info('Stream finished');
+    }
+
+    private function getNewClient()
+    {
+        $options = [];
+        $twitterOauthParameters = [
+            'consumer_key' => '',
+            'consumer_secret' => '',
+            'token' => '',
+            'token_secret' => '',
+        ];
+
+        $oauth = new Oauth1($twitterOauthParameters);
+
+        return GuzzleClientFactory::get($options, $oauth, $this->logger);
+    }
+
+    private function getResponse($keywords)
+    {
+        $response = null;
+
+        try {
+            $response = $this->client->post('statuses/filter.json', [
+                'form_params' => [
+                    'track' => $keywords
+                ],
+                'stream' => true
+            ]);
+        } catch (ClientException $e) {
+            $this->logger->error(
+                "Twitter refused connection",
+                [
+                    'Exception' => $e
+                ]
+            );
+            if($e->getCode()) //if too much requests change the client
+            {
+//                $client = $this->getNewClient();
+            }
+        }
+
+        return $response;
     }
 }

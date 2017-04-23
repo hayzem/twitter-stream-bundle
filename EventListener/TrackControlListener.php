@@ -59,13 +59,13 @@ class TrackControlListener
         $trackId = $trackEvent->getTrackId();
         $keywords = $trackEvent->getKeywords();
 
-        exec('php '.$this->command.' restart '.$trackId.' "'.$keywords.'" '.$this->commandTail);
+        exec('php '.$this->command.' restart --trackId='.$trackId.' --keywords="'.$keywords.'" '.$this->commandTail);
     }
 
     public function stopTrackHandler(TrackEvent $trackEvent)
     {
         $trackId = $trackEvent->getTrackId();
 
-        exec('php '.$this->command.' stop '.$trackId.$this->commandTail);
+        exec('php '.$this->command.' stop --trackId='.$trackId.$this->commandTail);
     }
 }

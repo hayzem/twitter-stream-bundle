@@ -29,6 +29,7 @@ class TwitterStreamCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $kernelRootDir = $this->getContainer()->getParameter('kernel.root_dir');
+        $logger = $this->getContainer()->get('logger');
         $appDir = str_replace('/app', '', $kernelRootDir);
         $this->command = $appDir.'/bin/console hayzem:twitter:stream:track';
 
@@ -57,13 +58,14 @@ class TwitterStreamCommand extends ContainerAwareCommand
              */
 
         }elseif ($mode == "stop"){
-            $pid = $this->isRunning($input->getArgument('trackId'));
+            $logger->info('Stopping... '.$trackId);
+            $pid = $this->isRunning($trackId);
             if(!$pid){
-                $output->writeln('Tracking is not running!');
+                $logger->info('Skipping... '.$trackId.' is not running!');
                 die;
             }
             exec("kill -9 ".$pid);
-            $output->writeln('Tracking stopped for '.$input->getArgument('trackId'));
+            $logger->info('Tracking stopped for '.$trackId);
         }
     }
 
@@ -78,7 +80,7 @@ class TwitterStreamCommand extends ContainerAwareCommand
     }
 
     protected function isRunning($trackId){
-        exec("ps -ef | grep -o '.*$this->command.* $trackId' | grep -v grep | awk '{print $2}'", $pids);
+        exec("ps -ef | grep -o '.*$this->command.*--trackId=$trackId' | grep -v grep | awk '{print $2}'", $pids);
         if (count($pids) > 0) {
             return $pids[0];
         }

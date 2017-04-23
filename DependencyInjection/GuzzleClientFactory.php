@@ -15,7 +15,7 @@ use Monolog\Logger;
  */
 class GuzzleClientFactory
 {
-    public static function get(array $options, Oauth1 $oauth1, Logger $logger, TwitterStreamService $twitterStreamService)
+    public static function get(array $options, Oauth1 $oauth1, Logger $logger)
     {
         $handlerStack = HandlerStack::create();
 
@@ -43,7 +43,7 @@ class GuzzleClientFactory
             );
         } catch (\Exception $e) {
             $logger->error(
-                "Client failed when connection",
+                "Client failed on connection",
                 [
                     'Exception' => $e
                 ]
