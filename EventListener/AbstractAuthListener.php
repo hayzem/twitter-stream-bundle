@@ -12,7 +12,7 @@ abstract class AbstractAuthListener
     public static function getSubscribedEvents()
     {
         return array(
-            'twitter_stream.event.twitter.auth' => 'newAuthHandler',
+            'twitter_stream.event.auth' => 'newAuthHandler',
         );
     }
 

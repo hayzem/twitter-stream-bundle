@@ -24,6 +24,17 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        $authEvent = new AuthEvent();
+        $authEvent->setConsumerKey('asdawdad');
+        $authEvent->setConsumerSecret('asdawdad');
+        $authEvent->setOauthToken('asdawdad');
+        $authEvent->setOauthTokenSecret('asdawdad');
+        $authEvent->setUserId('asdawdad');
+        $authEvent->setScreenName('asdawdad');
+        $authEvent->setXAuthExpires('asdawdad');
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->dispatch('twitter_stream.event.auth', $authEvent);
+        die;
         $consumerKey = $this->container->getParameter('twitter_consumer_key');
         $consumerSecret = $this->container->getParameter('twitter_consumer_secret');
 
