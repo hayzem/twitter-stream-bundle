@@ -1,8 +1,4 @@
 parameters:
-    twitter.consumer_key: 'wEX8Alm9tQuWnRsB4JfCQd8mO'
-    twitter.consumer_secret: 'hpm51WZZXEGkOjgv6BMVqMUlEEguXbLLdiL2mn4rQAULXg2p4j'
-    twitter.token: '1300030753-yGhUHE8VctwCNN8PJa9JtZG7j1I1VBPzXFWaekt'
-    twitter.token_secret: 'zo3FCBJEmMaFR8IYrKk2qQmKsjAyLdzkQbpbDVrCJ8S7b'
     gcm_ttl: ''
     link_placeholder: ''
     max_pushes_per_hour: ''
