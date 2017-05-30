@@ -99,7 +99,7 @@ class TwitterTrackCommand extends ContainerAwareCommand
                                 "Failed to dispatch",
                                 [
                                     'TweetId' => $data['id_str'],
-                                    'Exception' => $e
+                                    'Exception' => $e->getMessage()
                                 ]
                             );
                         }
